@@ -10,7 +10,7 @@
 
 ## How to run yourself  
 
-- git clone <https://github.com/nathen418/MiltiESP>  
+- git clone <https://github.com/nathen418/MultiESP>  
 - Edit the files to customize the WiFi name and password.
 - Upload the appropriate sketch file to your ESP32
 - Profit 💰💸
