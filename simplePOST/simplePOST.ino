@@ -2,12 +2,23 @@
 #include <HTTPClient.h>
 #include <LiquidCrystal.h>
 
-// Create An LCD Object. Signals: [ RS, EN, D4, D5, D6, D7 ]
-LiquidCrystal lcd(26, 27, 17, 5, 18, 19);
+int S = 33;
+int E = 32;
+int D4 = 19;
+int D5 = 27;
+int D6 = 26;
+int D7 = 25;
+
+int White = 15;
+int Amber = 4;
+int Green = 6;
+int Blue = 17;
+int Red = 18;
+
+LiquidCrystal lcd(S, E, D4, D5, D6, D7);
 const char *ssid = "MyResNet Legacy";
 const char *password = "REPLACE_WITH_YOUR_PASSWORD";
 
-// Your Domain name with URL path or IP address with path
 String serverName = "https://www.playantares.com/";
 unsigned long lastTime = 0;
 unsigned long timerDelay = 5000;
@@ -27,30 +38,34 @@ void wipe(int count, int mils)
 {
 	for (int i = 0; i < count; i++)
 	{
-		digitalWrite(19, HIGH);
+		digitalWrite(Red, HIGH);
 		delay(mils);
-		digitalWrite(18, HIGH);
+		digitalWrite(Blue, HIGH);
 		delay(mils);
-		digitalWrite(5, HIGH);
+		digitalWrite(Green, HIGH);
 		delay(mils);
-		digitalWrite(17, HIGH);
+		digitalWrite(Amber, HIGH);
 		delay(mils);
-		digitalWrite(LED_BUILTIN, HIGH);
+		digitalWrite(White, HIGH);
 		delay(mils);
-		digitalWrite(19, LOW);
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(mils);
+		digitalWrite(Red, LOW);
 		delay(mils);
-		digitalWrite(18, LOW);
+		digitalWrite(Blue, LOW);
 		delay(mils);
-		digitalWrite(5, LOW);
+		digitalWrite(Green, LOW);
 		delay(mils);
-		digitalWrite(17, LOW);
+		digitalWrite(Amber, LOW);
 		delay(mils);
-		digitalWrite(LED_BUILTIN, LOW);
+		digitalWrite(White, LOW);
 		delay(mils);
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(mils);
 	}
 }
 
-void init()
+void test()
 {
 	// LCD Test
 	lcd.begin(16, 2);
@@ -71,6 +86,7 @@ void init()
 		lcd.setCursor(0, 1);
 		lcd.print("SSID: ");
 		lcd.print(ssid);
+    
 		lcd.print("...");
 	}
 	lcd.clear();
@@ -94,13 +110,13 @@ void waitingStatus(int state)
 	// state = 1 - Not Waiting
 	if (state == 0)
 	{
-		digitalWrite(34, HIGH); // Red
-		digitalWrite(33, HIGH); // Yellow
+		digitalWrite(Red, HIGH);
+		digitalWrite(Amber, HIGH);
 	}
 	else if (state == 1)
 	{
-		digitalWrite(34, LOW); // Red
-		digitalWrite(33, LOW); // Yellow
+		digitalWrite(Red, LOW);
+		digitalWrite(Amber, LOW);
 	}
 }
 
@@ -112,9 +128,9 @@ void request()
 	http.begin(serverName.c_str());
 
 	// Send HTTP GET request
-	blinkNum(1, 100, 18);
+	blinkNum(1, 100, Blue);
 	int httpResponseCode = http.GET();
-	blinkNum(1, 100, 18);
+	blinkNum(1, 100, Blue);
 
 	if (httpResponseCode == 200)
 	{
@@ -122,43 +138,42 @@ void request()
 		Serial.println(httpResponseCode);
 		String payload = http.getString();
 		Serial.println(payload);
-		blinkNum(2, 250, 5);
+		blinkNum(2, 250, Green);
 	}
 	else
 	{
 		Serial.print("Error code: ");
 		Serial.println(httpResponseCode);
-		blinkNum(8, 90, 19);
+		blinkNum(8, 90, Red);
 	}
 	// Free resources
 	http.end();
-	blinkNum(1, 600, 17);
-	waitingStatus();
+	blinkNum(1, 600, Amber);
+	waitingStatus(0);
 }
 
 void setup()
 {
-	// LED pins
-	pinMode(LED_BUILTIN, OUTPUT); // Integrated Blue LED
-	pinMode(34, OUTPUT);		  // Red
-	pinMode(35, OUTPUT);		  // Blue
-	pinMode(32, OUTPUT);		  // Green
-	pinMode(33, OUTPUT);		  // Yellow
-	pinMode(25, OUTPUT);		  // White
+  
+	// Set LED pins to Output
+	pinMode(Red, OUTPUT);
+	pinMode(Blue, OUTPUT);
+	pinMode(Green, OUTPUT);
+	pinMode(Amber, OUTPUT);
+	pinMode(White, OUTPUT);
 
-	// LCD Pins
-	// pinMode(23, OUTPUT); // LCD
-	// pinMode(26, OUTPUT); // LCD
-	// pinMode(25, OUTPUT); // LCD
-	// pinMode(33, OUTPUT); // LCD
-	// pinMode(32, OUTPUT); // LCD
+  //Test Function
+  //test();
 
+  //Init LCD
 	lcd.begin(16, 2);
 	lcd.clear();
 	lcd.print("Testing...");
 
+  //Init Serial
 	Serial.begin(115200);
 
+  //Init WiFi
 	WiFi.begin(ssid);
 	Serial.println("Connecting");
 	while (WiFi.status() != WL_CONNECTED)
@@ -169,8 +184,7 @@ void setup()
 	Serial.println("");
 	Serial.print("Connected to WiFi network with IP Address: ");
 	Serial.println(WiFi.localIP());
-	digitalWrite(19, HIGH);
-	digitalWrite(17, HIGH);
+	waitingStatus(0);
 }
 
 void loop()
@@ -178,8 +192,7 @@ void loop()
 	// Only enter this if the timer has expired
 	if ((millis() - lastTime) > timerDelay)
 	{
-		digitalWrite(19, LOW);
-		digitalWrite(17, LOW);
+		waitingStatus(1);
 		// Check WiFi connection status
 		if (WiFi.status() == WL_CONNECTED)
 		{
@@ -189,7 +202,7 @@ void loop()
 		else
 		{
 			Serial.println("WiFi Disconnected");
-			blinkNum(5, 70, 34);
+			blinkNum(5, 70, Red);
 			lcd.clear();
 			lcd.print("WiFi Disconnected");
 		}
