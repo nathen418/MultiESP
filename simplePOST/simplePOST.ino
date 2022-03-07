@@ -11,7 +11,7 @@ int D7 = 25;
 
 int White = 15;
 int Amber = 4;
-int Green = 6;
+int Green = 16;
 int Blue = 17;
 int Red = 18;
 
@@ -71,36 +71,33 @@ void test()
 	lcd.begin(16, 2);
 	lcd.clear();
 	lcd.print("LCD Self Test");
+  delay(500);
 	lcd.setCursor(0, 1);
 	lcd.print("Success...");
 	delay(2000);
 	lcd.clear();
 
+  // LED Test
+  lcd.setCursor(0, 0);
+  lcd.print("LED Self Test");
+  wipe(4, 80);
+  lcd.clear();
+
 	// WiFi Test
-	WiFi.begin(ssid, password);
+	WiFi.begin(ssid);
 	while (WiFi.status() != WL_CONNECTED)
 	{
 		blinkNum(5, 100, LED_BUILTIN);
 		lcd.setCursor(0, 0);
-		lcd.print("Connecting to WiFi");
+		lcd.print("Connecting...");
 		lcd.setCursor(0, 1);
-		lcd.print("SSID: ");
 		lcd.print(ssid);
-    
-		lcd.print("...");
 	}
 	lcd.clear();
-	lcd.print("Connected to WiFi");
+	lcd.print("Connected");
 	lcd.setCursor(0, 1);
-	lcd.print("IP: ");
 	lcd.print(WiFi.localIP());
 	delay(4000);
-	lcd.clear();
-
-	// LED Test
-	lcd.setCursor(0, 0);
-	lcd.print("LED Test");
-	wipe(4, 80);
 	lcd.clear();
 }
 
@@ -122,6 +119,7 @@ void waitingStatus(int state)
 
 void request()
 {
+  lcd.clear();
 	HTTPClient http;
 
 	// Your Domain name with URL path or IP address with path
@@ -129,61 +127,53 @@ void request()
 
 	// Send HTTP GET request
 	blinkNum(1, 100, Blue);
+  lcd.print("Sending Request");
 	int httpResponseCode = http.GET();
+  lcd.clear();
 	blinkNum(1, 100, Blue);
 
 	if (httpResponseCode == 200)
 	{
-		Serial.print("OK");
-		Serial.println(httpResponseCode);
+    lcd.print("Response: ");
+		lcd.print(httpResponseCode);
 		String payload = http.getString();
-		Serial.println(payload);
 		blinkNum(2, 250, Green);
+    lcd.clear();
 	}
 	else
 	{
-		Serial.print("Error code: ");
-		Serial.println(httpResponseCode);
+    lcd.print("Response: ");
+    lcd.print(httpResponseCode);
 		blinkNum(8, 90, Red);
+    lcd.clear();
 	}
 	// Free resources
 	http.end();
 	blinkNum(1, 600, Amber);
 	waitingStatus(0);
+  lcd.print("Waiting...");
 }
 
 void setup()
 {
   
-	// Set LED pins to Output
-	pinMode(Red, OUTPUT);
-	pinMode(Blue, OUTPUT);
-	pinMode(Green, OUTPUT);
-	pinMode(Amber, OUTPUT);
-	pinMode(White, OUTPUT);
-
+// Set LED pins to Output
+	pinMode(18,OUTPUT);
+	pinMode(17,OUTPUT);
+	pinMode(16,OUTPUT);
+	pinMode(4,OUTPUT);
+	pinMode(15,OUTPUT);
+  //wipe(5,80);
   //Test Function
-  //test();
+  test();
 
-  //Init LCD
-	lcd.begin(16, 2);
+  //Clear LCD
 	lcd.clear();
-	lcd.print("Testing...");
 
   //Init Serial
 	Serial.begin(115200);
 
   //Init WiFi
-	WiFi.begin(ssid);
-	Serial.println("Connecting");
-	while (WiFi.status() != WL_CONNECTED)
-	{
-		delay(500);
-		Serial.print(".");
-	}
-	Serial.println("");
-	Serial.print("Connected to WiFi network with IP Address: ");
-	Serial.println(WiFi.localIP());
 	waitingStatus(0);
 }
 
@@ -201,10 +191,9 @@ void loop()
 		}
 		else
 		{
-			Serial.println("WiFi Disconnected");
 			blinkNum(5, 70, Red);
 			lcd.clear();
-			lcd.print("WiFi Disconnected");
+			lcd.print("Disconnected");
 		}
 		lastTime = millis();
 	}
