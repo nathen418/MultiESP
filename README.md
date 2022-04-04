@@ -5,8 +5,15 @@
 
 # MultiESP
 
-- Description: A development for simple lightweight ESP32 based systems. Programmed for an ESP32 with a 16x2 LCD display, 5 color LED, and a piezoelectric buzzer.
+- Description: A development for simple lightweight ESP32 based systems.
 
+# Hardware
+- ESP32 (NodeMCU dev 1 package) with WiFi and Bluetooth
+- NEO-M8N GPS
+- DS1307 RTC and supporting battery
+- 16x2 Blue Backlit LCD
+- 5 color LEDS
+- Piezoelectric buzzer
 
 ## How to run yourself  
 
@@ -27,7 +34,7 @@
 - [Nate](https://nathen418.com)
 
 ## Join my discord server
-<https://dsc.gg/antaresnetwork>
+<https://playantares.com/discord>
 
 ## License
 
